@@ -1,5 +1,8 @@
 <div class="title">{{ user.name }}</div>
 <div class="info">
+  <div class="bio">
+    <div>{{ user.bio }}</div>
+  </div>
   <div class="organization">
     <a [routerLink]="['/organization', user.organization]">{{ user.organization }}</a>
   </div>
@@ -10,7 +13,6 @@
     Verify your email
   </div>
 </div>
-
 <div *ngIf="objects && objects.length > 0" class="section-title">Learning Objects</div>
 <div class="learning-objects">
   <ng-container *ngIf="objects && objects.length > 0">

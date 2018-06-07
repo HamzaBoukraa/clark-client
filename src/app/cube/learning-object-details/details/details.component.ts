@@ -13,6 +13,7 @@ import { LearningGoal } from '@cyber4all/clark-entity/dist/learning-goal';
 import { AuthService } from '../../../core/auth.service';
 import { NgClass } from '@angular/common';
 import { environment } from '@env/environment';
+import { TOOLTIP_TEXT } from '@env/tooltip-text';
 
 @Component({
   selector: 'cube-learning-object-details',
@@ -21,6 +22,7 @@ import { environment } from '@env/environment';
 })
 export class DetailsComponent implements OnInit, OnDestroy {
   private sub: any;
+  downloading = false;
   author: string;
   learningObjectName: string;
   learningObject: LearningObject;
@@ -32,7 +34,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
   returnUrl: string;
   saved = false;
 
-  canDownload = false;
+  canDownload = true;
+
+  public tips = TOOLTIP_TEXT;
 
   constructor(
     private learningObjectService: LearningObjectService,
@@ -50,9 +54,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
     this.fetchLearningObject();
 
-    // FIXME: Hotfix for whitlisting. Remove if functionallity is extended or removed
+    // FIXME: Hotfix for white listing. Remove if functionality is extended or removed
     if (environment.production) {
-      this.checkWhitelist();
+      // this.checkWhitelist();
     } else {
       this.canDownload = true;
     }
@@ -188,7 +192,13 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   async download(author: string, learningObjectName: string) {
-    this.cartService.downloadLearningObject(author, learningObjectName);
+    try {
+      this.downloading = true;
+      await this.cartService.downloadLearningObject(author, learningObjectName);
+      this.downloading = false;
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   removeFromCart() {

@@ -23,40 +23,65 @@ export class UserService {
   }
 
   validateUser(username: string): Promise<boolean> {
-    return this.http.get(USER_ROUTES.CHECK_USER_EXISTS(username), { withCredentials: true }).toPromise().then(val => {
-      return (<string[]> val.json()).length > 0;
-    }, error => {
-      console.error(error);
-      return false;
-    });
+    return username && username !== 'undefined'
+      ? this.http
+          .get(USER_ROUTES.CHECK_USER_EXISTS(username), {
+            withCredentials: true
+          })
+          .toPromise()
+          .then(
+            val => {
+              console.log(val);
+              return val.json() ? true : false;
+            },
+            error => {
+              console.error(error);
+              return false;
+            }
+          )
+      : Promise.resolve(false);
   }
-  
+
   getOrganizationMembers(organization: string): Promise<User[]> {
     let route = USER_ROUTES.GET_SAME_ORGANIZATION(organization);
-    return this.http.get(route).toPromise().then(val => {
-      const arr = val.json();
-      return arr.map(member => User.instantiate(member));
-    });
+    return this.http
+      .get(route)
+      .toPromise()
+      .then(val => {
+        const arr = val.json();
+        return arr.map(member => User.instantiate(member));
+      });
   }
 
   getGravatarImage(email, imgSize): string {
-    let defaultIcon = "identicon";
-    // r=pg checks the rating of the Gravatar image 
-    return 'https://www.gravatar.com/avatar/' + md5(email) + '?s=' + imgSize +
-      '?r=pg&d=' + defaultIcon;
+    const defaultIcon = 'identicon';
+    // r=pg checks the rating of the Gravatar image
+    return (
+      'https://www.gravatar.com/avatar/' +
+      md5(email) +
+      '?s=' +
+      imgSize +
+      '?r=pg&d=' +
+      defaultIcon
+    );
   }
 
   getUser(username: string): Promise<User> {
-    return this.http.get(USER_ROUTES.CHECK_USER_EXISTS(username), { withCredentials: true }).toPromise().then(val => {
-      const arr = val.json();
-      if (arr.length) {
-        return User.instantiate(arr[0]);
-      } else {
-        return null;
-      }
-    }, error => {
-      return null;
-    });
+    return username && username !== 'undefined'
+      ? this.http
+          .get(USER_ROUTES.CHECK_USER_EXISTS(username), {
+            withCredentials: true
+          })
+          .toPromise()
+          .then(
+            val => {
+              const user = val.json();
+              return user ? User.instantiate(user) : null;
+            },
+            error => {
+              return null;
+            }
+          )
+      : Promise.resolve(null);
   }
 }
-
