@@ -1,0 +1,8 @@
+<div class="remove-alert">
+  <i class="far fa-trash-alt"></i>Remove
+</div>
+<div class="structure-object {{learningObject.length}}" [ngClass]="{'published': learningObject.published, 'indirect no-drag': indexLevel}" [ngStyle]="{'margin-left': 25 * indexLevel + 'px'}">
+    <div class="object-name">{{ learningObject?.name }}</div>
+    <div class="object-length">{{ learningObject?.length }}</div>
+</div>
+<clark-structure-object *ngFor="let o of learningObject?.children" [learningObject]="o" [indexLevel]="indexLevel + 1"></clark-structure-object>

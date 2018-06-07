@@ -1,0 +1,41 @@
+<div class="object-structure-wrapper">
+  <div class="structure-title">
+    Structure - {{ learningObject?.name }}
+    <div class="status" [ngClass]="{'saving': saving, 'error': savingError}"> 
+      <div *ngIf="savingError && !saving">
+          error <i class="far fa-times"></i>
+      </div>
+      <div *ngIf="!savingError && saving">
+        saving... <i class="far fa-spinner-third fa-spin"></i>
+      </div>
+      <div *ngIf="!saving && !savingError">
+        saved <i class="far fa-check"></i>
+      </div>
+    </div>
+  </div>
+  <div class="structure-close" (click)="closeFunction()"><i class="far fa-times"></i></div>
+  <div class="structure-content">
+    <div class="structure-content-children">
+      <div class="structure-subtitle">
+        Learning Objects
+      </div>
+      <div class="object-list-container objects" [ngClass]="{'empty': !learningObject.children || !learningObject.children.length}" [dragula]="'objects'" [dragulaModel]="learningObject.children">
+        <div *ngIf="!learningObject.children || !learningObject.children.length" class="no-drag empty-alert">
+          <i class="fal fa-plus"></i>
+          Drop objects here to add!
+        </div>
+        <clark-structure-object class="draggable" *ngFor="let c of learningObject.children" [learningObject]="c" [indexLevel]="0"></clark-structure-object>
+      </div>
+    </div>
+    <div class="structure-content-add" [ngClass]="{'remove': removeMode}">
+      <div class="structure-subtitle">Add Learning Objects</div>
+      <div *ngIf="!allObjects?.length" class="empty-alert">
+        <i class="fal fa-plus"></i>
+        Drop objects here to add!
+      </div>
+      <div class="object-list-container existing" [dragula]="'objects'" [dragulaModel]="allObjects">
+          <clark-structure-object *ngFor="let c of allObjects" class="draggable" [learningObject]="c" [indexLevel]="0"></clark-structure-object>
+      </div>
+    </div>
+  </div>
+</div>

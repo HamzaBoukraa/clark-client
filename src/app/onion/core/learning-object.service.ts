@@ -83,7 +83,7 @@ export class LearningObjectService {
       .then(response => {
         return response
           .json()
-          .map(object => LearningObject.instantiate(object));
+          .map(object =>  LearningObject.instantiate(object));
       });
   }
   /**
@@ -169,9 +169,32 @@ export class LearningObjectService {
       this.auth.user.username,
       names
     );
-    
+
     return this.http
       .delete(route, { headers: this.headers, withCredentials: true })
       .toPromise();
+  }
+
+  /**
+   *
+   * @param learningObjectName the name of the parent learning object
+   * @param id the id of the new child object
+   */
+  addChild(learningObjectName: string, id: string) {
+    const route = USER_ROUTES.ADD_CHILD(this.auth.user.username, learningObjectName);
+
+    return this.http.post(route, {id: id}, {withCredentials: true}).toPromise();
+  }
+
+
+  /**
+   *
+   * @param learningObjectName the name of the parent learning object
+   * @param id the id of the new child object
+   */
+  removeChild(learningObjectName: string, id: string) {
+    console.log(this.auth.user);
+    const route = USER_ROUTES.REMOVE_CHILD(this.auth.user.username, learningObjectName) + '?childId=' + id;
+    return this.http.delete(route, {withCredentials: true}).toPromise();
   }
 }

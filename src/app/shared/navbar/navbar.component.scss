@@ -1,5 +1,10 @@
 @import '~_vars.scss';
 
+:host {
+  opacity: 0.99;
+  display: block;
+}
+
 .version.topbar {
 
   .version-label {

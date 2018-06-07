@@ -8,6 +8,7 @@ import { OnionRoutingModule } from './onion.routing';
 import { OnionComponent } from './onion.component';
 import { LearningObjectBuilderModule } from './learning-object-builder/learning-object-builder.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { LearningObjectStructureComponent } from './learning-object-structure/learning-object-structure.component';
 
 // Other
 import { OnionCoreModule } from './core/core.module';
@@ -21,6 +22,8 @@ import { ModalModule } from '../shared/modals';
 import { DashboardResolver } from './dashboard/dashboard.resolver';
 import { TooltipModule } from '@cyber4all/clark-tooltip';
 import { LearningObjectResolve } from './learning-object-builder/learning-object.resolver';
+import { DragulaModule } from 'ng2-dragula';
+import { StructureObjectComponent } from './learning-object-structure/structure-object/structure-object.component';
 
 /**
  * Defines the root module that is bootstrapped to start the application.
@@ -32,7 +35,9 @@ import { LearningObjectResolve } from './learning-object-builder/learning-object
   // Specifys the components included in this module
   declarations: [
     OnionComponent,
-    DashboardComponent
+    DashboardComponent,
+    LearningObjectStructureComponent,
+    StructureObjectComponent
   ],
   // Specifys all modules to be imported
   imports: [
@@ -48,7 +53,8 @@ import { LearningObjectResolve } from './learning-object-builder/learning-object
     CheckBoxModule,
     ModalModule,
     NotificationModule,
-    TooltipModule
+    TooltipModule,
+    DragulaModule,
   ],
   providers: [ DashboardResolver, LearningObjectResolve ]
 })

@@ -1,4 +1,4 @@
-import { User } from '@cyber4all/clark-entity';
+import { User, LearningObject } from '@cyber4all/clark-entity';
 import { AuthService } from 'app/core/auth.service';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, Resolve, Router } from '@angular/router';
 import { Injectable } from '@angular/core';
@@ -18,7 +18,7 @@ export class DashboardResolver implements Resolve<any> {
       .then(learningObjects => {
         return learningObjects;
       }).catch(err => {
-        
+        console.log(err);
       });
   }
 }

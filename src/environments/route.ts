@@ -50,6 +50,12 @@ export const USER_ROUTES = {
       environment.apiURL
     }/users/${encodeURIComponent(username)}/learning-objects/multiple/${encodeURIComponent(learningObjectNames)}`;
   },
+  ADD_CHILD(username, learningObjectName) {
+    return `${environment.apiURL}/learning-objects/${encodeURIComponent(username)}/${encodeURIComponent(learningObjectName)}/children`;
+  },
+  REMOVE_CHILD(username, learningObjectName) {
+    return `${environment.apiURL}/learning-objects/${encodeURIComponent(username)}/${encodeURIComponent(learningObjectName)}/children`;
+  },
   POST_FILE_TO_LEARNING_OBJECT: `${environment.contentManagerURL}/files`,
   DELETE_FILE_FROM_LEARNING_OBJECT(username, learningObjectName, filename) {
     return `${

@@ -4,7 +4,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs/Subject';
 import { LearningObjectService } from '../core/learning-object.service';
-import { LearningObject } from '@cyber4all/clark-entity';
+import { LearningObject, User } from '@cyber4all/clark-entity';
 import { ChangeDetectorRef } from '@angular/core';
 import { TOOLTIP_TEXT } from '@env/tooltip-text';
 import { AuthService } from 'app/core/auth.service';
@@ -23,6 +23,8 @@ export class DashboardComponent implements OnInit {
   hidden: Array<string> = []; // array of Learning Object id's that have been hidden from the view
   filters: Array<string> = []; // list of filters to be applied to the list of Learning Objects
   allSelected = false;
+  structurePopup = false;
+  user: User;
 
   constructor(
     private learningObjectService: LearningObjectService,
@@ -32,9 +34,12 @@ export class DashboardComponent implements OnInit {
     private app: ChangeDetectorRef,
     private route: ActivatedRoute,
     private auth: AuthService
-  ) {}
+  ) {
+    this.user = Object.assign({}, this.auth.user);
+  }
 
   ngOnInit() {
+    console.log(this.route.snapshot.data);
     this.learningObjects = this.route.snapshot.data['learningObjects'];
   }
   /**
@@ -226,6 +231,13 @@ export class DashboardComponent implements OnInit {
       new ModalListElement('<i class="far fa-edit"></i>Edit', 'edit')
     ];
 
+
+    if (learningObject.length !== 'nanomodule') {
+     list.push(
+       new ModalListElement('<i class="far fa-project-diagram"></i>Edit Structure', 'edit-structure')
+     );
+    }
+
     if (this.auth.user.emailVerified) {
       list.push(
         new ModalListElement(
@@ -276,6 +288,9 @@ export class DashboardComponent implements OnInit {
         switch (val) {
           case 'edit':
             this.edit();
+            break;
+          case 'edit-structure':
+            this.toggleStructurePopup();
             break;
           case 'delete':
             this.delete();
@@ -343,5 +358,9 @@ export class DashboardComponent implements OnInit {
           this.manageFilters(val);
         }
       });
+  }
+
+  toggleStructurePopup() {
+    this.structurePopup = !this.structurePopup;
   }
 }
