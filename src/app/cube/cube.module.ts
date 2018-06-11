@@ -24,6 +24,7 @@ import { HomeModule } from './home/home.module';
 import { SharedModule } from '../shared/shared.module';
 import { CheckBoxModule } from 'clark-checkbox';
 import { AuthModule } from '../auth/auth.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 // Components
 import { NavbarComponent } from '../shared/navbar/navbar.component';
@@ -98,7 +99,8 @@ import { UserProfileLearningObjectsResolver } from './user-profile/learning-obje
     NotificationModule,
     CollectionModule,
     TooltipModule,
-    DetailsModule, 
+    DetailsModule,
+    NotificationsModule
   ],
   providers: [LearningObjectService, CartService, UserProfileLearningObjectsResolver]
 })

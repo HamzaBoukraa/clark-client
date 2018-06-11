@@ -19,6 +19,7 @@ import { ProfileGuard } from './core/profile.guard';
 import { UserResolver } from './core/user.resolver';
 import { DashboardResolver } from '../onion/dashboard/dashboard.resolver';
 import { UserProfileLearningObjectsResolver } from './user-profile/learning-objects.resolver';
+import { NotificationsComponent } from './notifications/notifications.component';
 
 // Declared as a separate constant to be included as a child for breadcrumbs
 const detailRoute = {
@@ -50,6 +51,7 @@ const cube_routes: Routes = [
       { path: 'users/:username/preferences', component: UserPreferencesComponent, data: { breadcrumb: 'Preferences' },
         canActivate: [AuthGuard]
       },
+      { path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuard] },
       // Catch All
       { path: '**', component: UserProfileComponent, pathMatch: 'full', canActivate: [ProfileGuard] },
     ]

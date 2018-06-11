@@ -103,6 +103,9 @@ export const USER_ROUTES = {
   },
   VALIDATE_CAPTCHA() {
     return `${environment.apiURL}/users/validate-captcha`;
+  },
+  GET_NOTIFICATIONS(username: string): string {
+    return `${environment.apiURL}/users/${username}/notifications`;
   }
 };
 
