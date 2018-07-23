@@ -17,12 +17,13 @@ import { AuthService } from 'app/core/auth.service';
 })
 export class DashboardComponent implements OnInit {
   public tips = TOOLTIP_TEXT;
-  learningObjects: Array<LearningObject>;
+  learningObjects: LearningObject[] = [];
   focusedLearningObject: LearningObject; // learning object that has a popup up menu on display for it, used by delete and edit functions
   selected: Array<string> = []; // array of all learning objects that are currently selected (checkbox in UI)
   hidden: Array<string> = []; // array of Learning Object id's that have been hidden from the view
   filters: Array<string> = []; // list of filters to be applied to the list of Learning Objects
   allSelected = false;
+  loading = true;
 
   constructor(
     private learningObjectService: LearningObjectService,
@@ -34,21 +35,25 @@ export class DashboardComponent implements OnInit {
     private auth: AuthService
   ) {}
 
-  ngOnInit() {
-    this.learningObjects = this.route.snapshot.data['learningObjects'];
+  async ngOnInit() {
+    this.learningObjects = await this.getLearningObjects();
   }
   /**
    * Fetches and sets LearningObject[]
    *
    * @memberof DashboardComponent
    */
-  getLearningObjects() {
-    this.learningObjectService
+  async getLearningObjects(): Promise<LearningObject[]> {
+    this.loading = true;
+    return this.learningObjectService
       .getLearningObjects()
       .then(learningObjects => {
-        this.learningObjects = learningObjects;
+        this.loading = false;
+        return learningObjects;
       })
-      .catch(err => {});
+      .catch(err => {
+        this.loading = false;
+      });
   }
 
   /**
@@ -95,23 +100,23 @@ export class DashboardComponent implements OnInit {
           if (!multiple) {
             this.learningObjectService
               .delete(this.focusedLearningObject.name)
-              .then(() => {
+              .then(async () => {
                 this.notificationService.notify(
                   'Done!',
                   'New Learning Object(s) deleted!',
                   'good',
                   'far fa-times'
                 );
-                this.getLearningObjects();
+                this.learningObjects = await this.getLearningObjects();
               })
-              .catch(err => {
-                this.getLearningObjects();
+              .catch(async(err) => {
+                this.learningObjects = await this.getLearningObjects();
               });
           } else {
             this.learningObjectService
               // TODO: Verify selected is an array of names
               .deleteMultiple(this.selected)
-              .then(() => {
+              .then(async () => {
                 this.selected = [];
                 this.notificationService.notify(
                   'Done!',
@@ -119,7 +124,7 @@ export class DashboardComponent implements OnInit {
                   'good',
                   'far fa-times'
                 );
-                this.getLearningObjects();
+                this.learningObjects = await this.getLearningObjects();
               })
               .catch(err => {});
           }
@@ -132,9 +137,9 @@ export class DashboardComponent implements OnInit {
       await this.learningObjectService.togglePublished(
         this.focusedLearningObject
       );
-      this.getLearningObjects();
+      this.learningObjects = await this.getLearningObjects();
     } catch (e) {
-      let err = e._body
+      const err = e._body
         ? e._body
         : 'Server error occured. Please try again later';
       this.notificationService.notify(
@@ -158,10 +163,12 @@ export class DashboardComponent implements OnInit {
    * @param l Learning Object to be selected
    */
   selectLearningObject(l: LearningObject) {
-    if (!this.selected.includes(l['name'])) {
-      this.selected.push(l['name']);
-    }
+    this.selected.push(l.name);
     this.app.detectChanges();
+
+    if (this.selected.length === this.learningObjects.length && !this.allSelected) {
+      this.allSelected = true;
+    }
   }
 
   /**
@@ -169,15 +176,35 @@ export class DashboardComponent implements OnInit {
    * @param l Learning Object to be deselected
    */
   deselectLearningObject(l: LearningObject) {
-    this.selected.splice(this.selected.indexOf(l['name']), 1);
+    console.log(this.selected);
+    this.selected.splice(this.selected.indexOf(l.name), 1);
     this.app.detectChanges();
+
+    console.log(this.selected);
+
+    if (this.selected.length < this.learningObjects.length && this.allSelected) {
+      this.allSelected = false;
+    }
+  }
+
+  /**
+   * Returns a boolean that indicates whether the learning object with the specified name is selected
+   * @param name of the learning object in question
+   */
+  objectIsSelected(name: string): boolean {
+    return this.selected.includes(name);
   }
 
   /**
    * Selects all learning objects (duh)
    */
-  selectAll(selected) {
+  selectAll() {
     this.allSelected = !this.allSelected;
+    if (this.allSelected) {
+      this.selected = this.learningObjects.map(x => x.name);
+    } else {
+      this.selected = [];
+    }
   }
 
   /**
@@ -222,7 +249,7 @@ export class DashboardComponent implements OnInit {
    */
   makeContextMenu(event, learningObject: LearningObject) {
     this.focusedLearningObject = learningObject;
-    let list: Array<ModalListElement> = [
+    const list: Array<ModalListElement> = [
       new ModalListElement('<i class="far fa-edit"></i>Edit', 'edit')
     ];
 

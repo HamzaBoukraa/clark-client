@@ -9,7 +9,7 @@ import { Subject } from 'rxjs/Subject';
 import { Router, NavigationEnd, RouterEvent } from '@angular/router';
 import { Http, Headers, ResponseContentType } from '@angular/http';
 import { map } from 'rxjs/operator/map';
-import * as io from 'socket.io-client';
+// import * as io from 'socket.io';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Injectable()
@@ -134,10 +134,18 @@ export class AuthService {
       });
   }
 
-  register(user: User): Observable<any> {
+  register(user: User): Promise<User> {
     return this.http.post(environment.apiURL + '/users', user, {
       withCredentials: true,
       responseType: 'text'
+    }).toPromise().then(val => {
+      this.user = user;
+      this.changeStatus(true);
+      return this.user;
+    }, error => {
+      this.changeStatus(false);
+      this.user = undefined;
+      throw error;
     });
   }
 
@@ -223,7 +231,7 @@ export class AuthService {
   }
 
   establishSocket() {
-    if (!this.socketWatcher) {
+    /* if (!this.socketWatcher) {
       this.socketWatcher = new Observable(observer => {
         this.socket = io(environment.apiURL + '?user=' + this.username);
 
@@ -242,14 +250,30 @@ export class AuthService {
         });
       });
     }
-
     return this.socketWatcher;
+    */
+   return new Observable();
   }
 
   destroySocket() {
     if (this.socket) {
       this.socket.emit('close');
     }
+  }
+
+  getOrganizations(query: string) {
+    return this.http
+      .get(
+        environment.apiURL + `/users/organizations?query=${encodeURIComponent(query)}`,
+        {
+          headers: this.httpHeaders,
+          withCredentials: true
+        }
+      )
+      .toPromise()
+      .then(val => {
+        return val;
+      });
   }
 
   printCards() {
