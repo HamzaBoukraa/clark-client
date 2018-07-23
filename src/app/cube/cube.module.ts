@@ -76,13 +76,8 @@ import { UserProfileLearningObjectsResolver } from './user-profile/learning-obje
     ModalModule,
     NotificationModule,
     CollectionModule,
-<<<<<<< HEAD
-    TooltipModule,
+    NotificationsModule,
     DetailsModule,
-    NotificationsModule
-=======
-    DetailsModule,
->>>>>>> master
   ],
   providers: [LearningObjectService, UserProfileLearningObjectsResolver]
 })
