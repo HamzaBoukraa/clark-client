@@ -22,7 +22,7 @@
       <ng-template #userTemplate>
         <ng-container *ngIf="loggedin">
           <div class="contributor" (click)="contributorDropdown($event)"><span>Contribute</span> <i class="fas fa-chevron-down"></i></div>
-          <div class="right notification-container" routerLink="/notifications">
+          <div class="right notification-container">
             <i class="far fa-bell notification-icon"></i>
           </div>
           <div class="right library" routerLink="/library"></div>

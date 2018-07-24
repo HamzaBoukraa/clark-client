@@ -16,7 +16,6 @@ import { CubeCoreModule } from './core/cube-core.module';
 import { CubeSharedModule } from './shared/cube-shared.module';
 import { HomeModule } from './home/home.module';
 import { SharedModule } from '../shared/shared.module';
-import { NotificationsModule } from './notifications/notifications.module';
 
 // Components
 import { CubeComponent } from './cube.component';
@@ -76,7 +75,6 @@ import { UserProfileLearningObjectsResolver } from './user-profile/learning-obje
     ModalModule,
     ToasterModule,
     CollectionModule,
-    NotificationsModule,
     DetailsModule,
   ],
   providers: [LearningObjectService, UserProfileLearningObjectsResolver]
