@@ -11,12 +11,13 @@ export class NotificationPresenter {
   constructor(private auth: AuthService, private http: HttpClient) { }
 
   get notifications() {
-    return this.http.get(USER_ROUTES.GET_NOTIFICATIONS(this.auth.username), { withCredentials: true })
-    .map((data: { notifications: Notification[] }) => data.notifications
-    .map(notification =>
-      // Converts the numeric ISO date to the local date string for the view
-      ({ ...notification, date: new Date(notification.date).toLocaleDateString() })
-    ));
+    return this.http.get(USER_ROUTES.GET_NOTIFICATIONS(this.auth.username), { withCredentials: true }).toPromise()
+      .then((notififications: Notification[]) => {
+        return notififications.map((notification: Notification) =>
+          // Converts the numeric ISO date to the local date string for the view
+          ({ ...notification, date: new Date(notification.date).toLocaleDateString() })
+        );
+      });
   }
 }
 

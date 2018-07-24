@@ -13,7 +13,7 @@ export class NotificationsComponent implements OnInit {
   constructor(private presenter: NotificationPresenter) { }
 
   ngOnInit() {
-    this.presenter.notifications.subscribe(notifications => {
+    this.presenter.notifications.then(notifications => {
       this.notifications = notifications;
     });
   }
