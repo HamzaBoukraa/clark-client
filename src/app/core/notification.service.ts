@@ -8,12 +8,15 @@ import { USER_ROUTES } from '@env/route';
 })
 export class NotificationService {
 
-  constructor(private auth: AuthService, private http: HttpClient) { }
+  constructor(private auth: AuthService, private http: HttpClient) {
+    this.auth
+  }
 
-  get notifications() {
+  getNotifications(): Promise<Notification[]> {
     return this.http.get(USER_ROUTES.GET_NOTIFICATIONS(this.auth.username), { withCredentials: true }).toPromise()
-      .then((notififications: Notification[]) => {
-        return notififications.map((notification: Notification) =>
+      .then((notifications: Notification[]) => {
+        console.log(notifications);
+        return notifications.map((notification: Notification) =>
           // Converts the numeric ISO date to the local date string for the view
           ({ ...notification, date: new Date(notification.date).toLocaleDateString() })
         );
@@ -23,7 +26,7 @@ export class NotificationService {
 
 export interface Notification {
   text: string;
-  date: number;
+  date: string;
   link: string;
 }
 

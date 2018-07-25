@@ -28,6 +28,9 @@ import { FilterComponent } from './filter/filter.component';
 import { MappingsFilterComponent } from './mappings-filter/mappings-filter.component';
 import { SearchComponent } from './search/search.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
+import { NotificationDropdownComponent } from './notifications/notification-dropdown/notification-dropdown.component';
+import { NotificationListComponent } from './notifications/notification-list/notification-list.component';
+import { NotificationComponent } from './notifications/notification/notification.component';
 
 /**
  * Contains all stateless UI modules (directives, components, pipes) that are used across the app.
@@ -64,7 +67,10 @@ import { AutofocusDirective } from './directives/autofocus.directive';
     FilterComponent,
     MappingsFilterComponent,
     SearchComponent,
-    AutofocusDirective
+    AutofocusDirective,
+    NotificationDropdownComponent,
+    NotificationListComponent,
+    NotificationComponent
   ],
   exports: [
     BrowseByMappingsComponent,

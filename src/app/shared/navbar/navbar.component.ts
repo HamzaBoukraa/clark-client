@@ -3,7 +3,10 @@ import {
   OnInit,
   AfterContentChecked,
   HostListener,
-  OnDestroy
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+  AfterViewChecked
 } from '@angular/core';
 import { ModalService, Position, ModalListElement } from '../modals';
 import {
@@ -17,13 +20,15 @@ import { AuthService } from '../../core/auth.service';
 import * as md5 from 'md5';
 import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
+import { NotificationService, Notification } from '../../core/notification.service';
 
 @Component({
   selector: 'clark-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent implements OnInit, AfterContentChecked, OnDestroy {
+export class NavbarComponent implements OnInit, AfterViewChecked, AfterContentChecked, OnDestroy {
+  @ViewChild('notificationIcon') notificationIcon: ElementRef;
   // FIXME: Convert 'class' to 'type' for consistancy
   responsiveThreshold = 750;
   windowWidth: number;
@@ -43,9 +48,14 @@ export class NavbarComponent implements OnInit, AfterContentChecked, OnDestroy {
 
   url: string;
 
+  notifications: Notification[] = [];
+  notificationDropdownPosition: number;
+  showNotifications: false;
+
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.windowWidth = event.target.innerWidth;
+    this.notificationDropdownPosition = this.calculateNotificationDropdownPosition();
   }
 
   @HostListener('window:keyup', ['$event'])
@@ -61,7 +71,8 @@ export class NavbarComponent implements OnInit, AfterContentChecked, OnDestroy {
     private modalCtrl: ModalService,
     private router: Router,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) {
     this.windowWidth = window.innerWidth;
 
@@ -99,12 +110,30 @@ export class NavbarComponent implements OnInit, AfterContentChecked, OnDestroy {
     }
   }
 
+  calculateNotificationDropdownPosition(): number {
+    return this.notificationIcon.nativeElement.getBoundingClientRect().left + (this.notificationIcon.nativeElement.offsetWidth / 2) - 155;
+  }
+
   ngOnInit() {
     this.subs.push(
       this.authService.isLoggedIn.subscribe(val => {
         this.loggedin = val ? true : false;
+
+        if (val) {
+          setTimeout(() => {
+            this.notificationService.getNotifications().then(val => {
+              this.notifications = val;
+            });
+          }, 2000);
+        }
       })
     );
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.loggedin) {
+      this.notificationDropdownPosition = this.calculateNotificationDropdownPosition();
+    }
   }
 
   ngAfterContentChecked(): void {

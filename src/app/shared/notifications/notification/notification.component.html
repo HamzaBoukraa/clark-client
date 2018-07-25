@@ -1,0 +1,7 @@
+<div class="notification" [ngClass]="{'dismissed': dismissed}">
+  <!-- ::before element used to mark unread -->
+  <div class="icon"><i class="fas fa-star"></i></div>
+  <div class="text">{{ notification.text }}</div>
+  <div class="dismiss" (click)="triggerDismiss()"><i class="far fa-times"></i></div>
+  <!-- ::after element used for wipe animation -->
+</div>

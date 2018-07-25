@@ -22,8 +22,9 @@
       <ng-template #userTemplate>
         <ng-container *ngIf="loggedin">
           <div class="contributor" (click)="contributorDropdown($event)"><span>Contribute</span> <i class="fas fa-chevron-down"></i></div>
-          <div class="right notification-container">
-            <i class="far fa-bell notification-icon"></i>
+          <div #notificationIcon class="right notification-container" (click)="showNotifications = true; $event.stopPropagation()">
+            <span [ngClass]="{'ring': notifications?.length > 0}"><i class="far fa-bell notification-icon"></i></span>
+            <div class="notification-badge" [ngClass]="{'show': notifications?.length > 0}"><span>{{ notifications?.length }}</span></div>
           </div>
           <div class="right library" routerLink="/library"></div>
           <div class="left flex h flex-end user-menu" (click)="userDropdown($event)">
@@ -47,6 +48,9 @@
       </ng-template>
     </div>
   </div>
+
+  <clark-notification-dropdown *ngIf="loggedin" [notifications]="notifications" [position]="[notificationDropdownPosition, 80]" [active]="showNotifications" (clickOutside)="showNotifications = false"></clark-notification-dropdown>
+
 
   <!-- Overlay under mobile slideout -->
   <div class="slideout-underlay" *ngIf="!hideNavbar" [ngClass]="{'active': menuOpen || searchDown, 'underNav': !isMobile || searchDown}" (click)="menuOpen = false; hideSearch();"></div>

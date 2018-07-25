@@ -12,7 +12,8 @@ import { Component, Output, Input, ElementRef, EventEmitter, OnChanges, ChangeDe
             <div class="text">{{el.text}}</div>
         </div>
     </div>
-    `
+    `,
+    styleUrls: ['./toaster.component.scss']
 })
 export class ToasterComponent implements OnChanges, AfterViewChecked {
     toRender: Array<object> = [];

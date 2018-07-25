@@ -1,0 +1,11 @@
+<div class="notification-list">
+  <ng-container *ngIf="notifications?.length > 0; else showNone">
+      <clark-notification *ngFor="let n of notifications; let i = index;" [notification]="n" (dismiss)="dismiss(i)"></clark-notification>
+  </ng-container>
+  <ng-template #showNone>
+    <div class="none">
+        <div>🎉</div>
+        You're all caught up!
+    </div>
+  </ng-template>
+</div>
