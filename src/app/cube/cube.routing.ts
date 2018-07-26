@@ -17,6 +17,7 @@ import { CubeComponent } from './cube.component';
 import { CollectionComponent } from './collections/collection.component';
 import { ProfileGuard } from './core/profile.guard';
 import { UserResolver } from './core/user.resolver';
+import { NotificationsComponent } from './notifications/notifications.component';
 
 // Declared as a separate constant to be included as a child for breadcrumbs
 const detailRoute = {
@@ -41,6 +42,7 @@ const cube_routes: Routes = [
         path: 'library', component: RouterComponent, canActivate: [AuthGuard],
         children: [{ path: '', component: CartComponent }, detailRoute]
       },
+      { path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuard] },
       { path: 'users/:username', component: UserProfileComponent, resolve: {
         user: UserResolver
       }},

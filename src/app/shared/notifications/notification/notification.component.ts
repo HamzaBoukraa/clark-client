@@ -16,7 +16,10 @@ import { Notification } from '../../../core/notification.service';
 export class NotificationComponent implements OnInit {
 
   @Input() notification: Notification;
+  @Input() expandable: boolean;
   @Output() dismiss: EventEmitter<void> = new EventEmitter();
+  @Output() didExpand: EventEmitter<boolean> = new EventEmitter();
+  expanded = false;
   dismissed = false;
 
   constructor() { }
@@ -27,5 +30,15 @@ export class NotificationComponent implements OnInit {
   triggerDismiss() {
     this.dismiss.emit();
     this.dismissed = true;
+  }
+
+  toggleExpand() {
+    this.expanded = !this.expanded;
+    this.didExpand.next(this.expanded);
+  }
+
+  noNav(event) {
+    event.preventDefault();
+    event.stopPropagation();
   }
 }

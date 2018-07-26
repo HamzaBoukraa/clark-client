@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { NotificationService, Notification } from '../../../core/notification.service';
 
 
@@ -15,7 +15,7 @@ import { NotificationService, Notification } from '../../../core/notification.se
   templateUrl: './notification-dropdown.component.html',
   styleUrls: ['./notification-dropdown.component.scss']
 })
-export class NotificationDropdownComponent implements OnInit, OnChanges {
+export class NotificationDropdownComponent implements OnInit {
 
   @Input() position: [number, number]; // [left: number, top: number] (both in px)
   @Input() active: boolean;
@@ -24,26 +24,10 @@ export class NotificationDropdownComponent implements OnInit, OnChanges {
   constructor(private store: NotificationService) { }
 
   ngOnInit() {
-    // we didn't pass anything, so perform query
-    if (!this.notifications) {
-      this.fetchNotifications();
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-  }
-
-  fetchNotifications() {
-    console.log('querying for notifications');
-    this.store.getNotifications().then((val: Notification[]) => {
-      this.notifications = val;
-    });
   }
 
   dismissNotification(index: number) {
     // TODO server call and execute following logic if request is successful
-    setTimeout(() => {
-      this.notifications.splice(index, 1);
-    }, 300);
+    this.store.dismissNotification(index);
   }
 }

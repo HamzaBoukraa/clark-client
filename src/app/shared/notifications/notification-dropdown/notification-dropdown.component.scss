@@ -3,7 +3,7 @@
 .notification-dropdown {
     position: absolute;
     box-sizing: border-box;
-    border-radius: 3px;
+    // border-radius: 3px;
     box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.15);
     background: white;
     z-index: 4;
@@ -31,6 +31,7 @@
         flex-grow: 0;
         flex-shrink: 0;
         box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.05);
+        // border-radius: 3px 3px 0px 0px;
     }
 
     .footer {
@@ -39,7 +40,7 @@
         box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.05);
         padding: 5px 20px;
         text-align: center;
-        background: linear-gradient(45deg, lighten($placeholder, 10), lighten($placeholder, 30));
+        background: linear-gradient(45deg, lighten($placeholder, 10), lighten($placeholder, 12));
         text-decoration: underline;
         color: $blue-accent;
         cursor: pointer;

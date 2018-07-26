@@ -1,6 +1,9 @@
 <div class="notification-list">
   <ng-container *ngIf="notifications?.length > 0; else showNone">
-      <clark-notification *ngFor="let n of notifications; let i = index;" [notification]="n" (dismiss)="dismiss(i)"></clark-notification>
+    <ng-container *ngFor="let n of notifications; let i = index;">
+        <div *ngIf="firstWithDate(n.date) === i" class="notification-date-header">{{ n.date | date:"MMMM d, yyyy" }}</div>
+        <clark-notification [notification]="n" [expandable]="expandable" (dismiss)="dismiss(i)"></clark-notification>
+    </ng-container>
   </ng-container>
   <ng-template #showNone>
     <div class="none">

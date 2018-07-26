@@ -86,7 +86,10 @@ import { NotificationComponent } from './notifications/notification/notification
     LearningObjectCardDirective,
     FilterComponent,
     MappingsFilterComponent,
-    AutofocusDirective
+    AutofocusDirective,
+    NotificationDropdownComponent,
+    NotificationListComponent,
+    NotificationComponent
   ]
 })
 export class SharedModule {}

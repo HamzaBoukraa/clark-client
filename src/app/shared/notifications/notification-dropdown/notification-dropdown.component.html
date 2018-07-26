@@ -1,7 +1,9 @@
 <div class="notification-dropdown" [ngStyle]="{'left': position[0] + 'px', 'top': (active ? position[1] : position[1] - 20) + 'px'}" [ngClass]="{'active': active}">
-  <div class="header">Notifications</div>
+  <div class="header">Notifications <span *ngIf="notifications?.length > 0">({{ notifications.length }})</span></div>
   <div class="list-wrapper">
       <clark-notification-list [notifications]="notifications" (dismissNotification)="dismissNotification($event)"></clark-notification-list>
   </div>
-  <div class="footer">See all</div>
+  <a routerLink="/notifications">
+    <div class="footer">See all</div>
+  </a>
 </div>

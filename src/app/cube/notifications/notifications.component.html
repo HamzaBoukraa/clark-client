@@ -1,0 +1,6 @@
+<div class="notifications-wrapper">
+  <div class="inner">
+    <div class="title">Notifications <span (click)="dismissAllNotifications()">Clear all</span></div>
+    <clark-notification-list [notifications]="notifications" [expandable]="true" (dismissNotification)="dismissNotification($event)"></clark-notification-list>
+  </div>
+</div>

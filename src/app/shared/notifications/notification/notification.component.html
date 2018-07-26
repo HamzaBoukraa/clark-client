@@ -1,7 +1,26 @@
-<div class="notification" [ngClass]="{'dismissed': dismissed}">
-  <!-- ::before element used to mark unread -->
-  <div class="icon"><i class="fas fa-star"></i></div>
-  <div class="text">{{ notification.text }}</div>
-  <div class="dismiss" (click)="triggerDismiss()"><i class="far fa-times"></i></div>
-  <!-- ::after element used for wipe animation -->
-</div>
+<ng-container *ngIf="!expanded; else notificationTemplate">
+  <a routerLink="{{notification.link}}" [ngClass]="{'expanded': expanded}">
+    <ng-container [ngTemplateOutlet]="notificationTemplate"></ng-container>
+  </a>
+</ng-container>
+
+<ng-template #notificationTemplate>
+  <div class="notification" [ngClass]="{'dismissed': dismissed, 'expanded': expanded}">
+    <!-- ::before element used to mark unread -->
+    <div class="icon">
+      <i class="fas fa-star"></i>
+    </div>
+    <div class="text">{{ notification.text }}</div>
+    <div class="icon-group">
+      <div *ngIf="expandable" class="expand" [ngClass]="{'down': expanded}" (click)="toggleExpand(); noNav($event)" tip="{{ expanded ? 'Collapse' : 'Expand' }} notification"
+        tipLocation="bottom">
+        <i class="far fa-chevron-down"></i>
+      </div>
+      <div class="dismiss" (click)="triggerDismiss(); noNav($event);" tip="Dismiss notification" tipLocation="bottom">
+        <i class="far fa-times"></i>
+      </div>
+    </div>
+    <!-- ::after element used for wipe animation -->
+  </div>
+  <a *ngIf="expanded" routerLink="{{notification.link}}" class="expanded-nav">View Link <i class="fas fa-external-link"></i></a>
+</ng-template>

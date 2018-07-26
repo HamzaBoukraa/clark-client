@@ -40,6 +40,7 @@ import {
 import { CollectionModule } from './collections/collection.module';
 import { DetailsModule } from './learning-object-details/details/details.module';
 import { UserProfileLearningObjectsResolver } from './user-profile/learning-objects.resolver';
+import { NotificationsComponent } from './notifications/notifications.component';
 
 /**
  * A feature collection module that bundles all feature modules related to the cube.
@@ -57,6 +58,7 @@ import { UserProfileLearningObjectsResolver } from './user-profile/learning-obje
     UserInformationComponent,
     UserEditInformationComponent,
     OrganizationListComponent,
+    NotificationsComponent,
   ],
   imports: [
     // Angular imports

@@ -1,7 +1,7 @@
 @import '~_vars.scss';
 
 .notification-list {
-    padding: 10px 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
 
@@ -16,7 +16,13 @@
         }
     }
 
-    & > *:not(:last-child) {
+    ::ng-deep & > *:not(:last-child) .notification {
         border-bottom: 1px solid lighten($placeholder, 18);
+    }
+
+    .notification-date-header {
+        background: rgba(0, 0, 0, 0.1);
+        color: $dark-text;
+        padding: 2px 5px;
     }
 }

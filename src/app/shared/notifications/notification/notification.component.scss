@@ -10,25 +10,13 @@
     max-height: 100px;
     transition: all 0.2s ease;
     overflow: hidden;
+    background: rgba(0, 0, 0, 0);
 
-    & > *:not(.text) {
-        width: 15px;
-        height: 15px;
-        flex-grow: 0;
-        flex-shrink: 0;
-        font-size: 12px;
-    }
 
     .icon {
-        margin-right: 5px;
+        margin-right: 10px;
         color: gold;
-    }
-
-    .dismiss {
-        margin-left: 5px;
-        color: darken($placeholder, 15);
-        text-align: right;
-        cursor: pointer;
+        font-size: 16px;
     }
 
     .text {
@@ -36,6 +24,31 @@
         overflow: hidden;
         text-overflow: ellipsis;
         color: $dark-text;
+        flex-grow: 1;
+    }
+
+    .icon-group {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        color: darken($placeholder, 15);
+        flex-grow: 1;
+
+        & > * {
+            padding: 2px;
+            margin-left: 5px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+
+            &:hover {
+                color: $blue-accent;
+            }
+
+            &.down {
+                transform: rotate(180deg);
+            }
+        }
     }
 
     &:after {
@@ -46,24 +59,41 @@
         top: 0;
         bottom: 0;
         width: 0;
-        background: $bright-blue;
+        background: linear-gradient(45deg, darken($bright-blue, 15), $bright-blue);
         opacity: 0;
         visibility: hidden;
         transition: all 0.2s ease-in;
     }
 
     &.dismissed {
-        max-height: 0;
+        max-height: 0 !important;
         transition-delay: 0.1s;
         padding-top: 0;
         padding-bottom: 0;
+        border-width: 0;
 
         &:after {
             transition-delay: 0s;
             opacity: 1;
             visibility: visible;
-
             width: 100%;
         }
     }
+
+    &.expanded {
+        max-height: 400px;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+        border-color: transparent !important;
+        align-items: flex-start;
+
+        .text {
+            white-space: normal;
+        }
+    }
+}
+
+.expanded-nav {
+    text-align: center;
+    display: block;
 }

@@ -17,6 +17,7 @@ import { Notification } from '../../../core/notification.service';
 export class NotificationListComponent implements OnInit {
 
   @Input() notifications: Notification[];
+  @Input() expandable: boolean;
   @Output() dismissNotification: EventEmitter<number> = new EventEmitter();
 
   constructor() {
@@ -25,8 +26,34 @@ export class NotificationListComponent implements OnInit {
   ngOnInit() { }
 
   dismiss(index: number) {
-    // TODO server call here
     this.dismissNotification.emit(index);
+  }
+
+  /**
+   * Returns the first index of a notification with the specified date (or -1 if a matching notification doesn't exist)
+   * @param date
+   */
+  firstWithDate(date: Date) {
+    for (let i = 0, l = this.notifications.length; i < l; i++) {
+      if (date.toDateString() === this.notifications[i].date.toDateString()) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Returns the number of notifications with specific date.
+   * @param date
+   */
+  countWithDate(date: Date) {
+    let count = 0;
+    for (let i = 0, l = this.notifications.length; i < l; i++) {
+      if (date.toDateString() === this.notifications[i].date.toDateString()) {
+        count++;
+      }
+    }
+    return count;
   }
 
 }

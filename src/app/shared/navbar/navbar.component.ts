@@ -47,10 +47,11 @@ export class NavbarComponent implements OnInit, AfterViewChecked, AfterContentCh
   searchOverflow = false; // flag for wheher or not the search is down
 
   url: string;
-
-  notifications: Notification[] = [];
+  
   notificationDropdownPosition: number;
   showNotifications: false;
+  countNotifications = 0;
+  bellRinging = false;
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
@@ -96,6 +97,7 @@ export class NavbarComponent implements OnInit, AfterViewChecked, AfterContentCh
           this.hideNavbar = root.children[0].snapshot.data.hideTopbar;
 
           this.url = e.url;
+          this.showNotifications = false;
         }
       })
     );
@@ -120,12 +122,20 @@ export class NavbarComponent implements OnInit, AfterViewChecked, AfterContentCh
         this.loggedin = val ? true : false;
 
         if (val) {
-          setTimeout(() => {
-            this.notificationService.getNotifications().then(val => {
-              this.notifications = val;
-            });
-          }, 2000);
+          this.notificationService.getNotifications();
         }
+      }),
+
+      this.notificationService.notifications.subscribe(val => {
+        if (val.length > this.countNotifications) {
+          this.bellRinging = true;
+        }
+
+        this.countNotifications = val.length;
+
+        setTimeout(() => {
+          this.bellRinging = false;
+        }, 300);
       })
     );
   }
