@@ -39,6 +39,7 @@ import {
 import { CollectionModule } from './collections/collection.module';
 import { DetailsModule } from './details/details.module';
 import { UserProfileLearningObjectsResolver } from './user-profile/learning-objects.resolver';
+import { Error404Component } from './error404/error404.component';
 
 /**
  * A feature collection module that bundles all feature modules related to the cube.
@@ -56,6 +57,7 @@ import { UserProfileLearningObjectsResolver } from './user-profile/learning-obje
     UserInformationComponent,
     UserEditInformationComponent,
     OrganizationListComponent,
+    Error404Component,
   ],
   imports: [
     // Angular imports

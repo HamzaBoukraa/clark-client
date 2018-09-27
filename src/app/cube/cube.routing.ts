@@ -1,17 +1,20 @@
-import { OrganizationListComponent } from './organization-list/organization-list.component';
+
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { HomeComponent } from './home/home.component';
-import { DetailsComponent } from './details/details.component';
-import { CartComponent } from './cart/cart.component';
 import { BrowseComponent } from './browse/browse.component';
+import { CartComponent } from './cart/cart.component';
+import { CollectionComponent } from './collections/collection.component';
+import { DetailsComponent } from './details/details.component';
+import { Error404Component } from './error404/error404.component';
+import { HomeComponent } from './home/home.component';
+import { OrganizationListComponent } from './organization-list/organization-list.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserPreferencesComponent } from './user-profile/user-preferences/user-preferences.component';
 import { RouterComponent } from './shared/breadcrumb/router.component';
 import { AuthGuard } from '../core/auth-guard.service';
 import { CubeComponent } from './cube.component';
-import { CollectionComponent } from './collections/collection.component';
+
 import { ProfileGuard } from './core/profile.guard';
 import { UserResolver } from './core/user.resolver';
 
@@ -43,6 +46,9 @@ const cube_routes: Routes = [
       }},
       { path: 'users/:username/preferences', component: UserPreferencesComponent, data: { breadcrumb: 'Preferences' },
         canActivate: [AuthGuard]
+      },
+      {
+         path: 'error404', component: Error404Component, data: { hideNavbar: true }
       },
       // Catch All
       { path: '**', component: UserProfileComponent, pathMatch: 'full', canActivate: [ProfileGuard] },

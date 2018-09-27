@@ -84,6 +84,8 @@ export class NavbarComponent implements OnInit, AfterContentChecked, OnDestroy {
           const root: ActivatedRoute = this.route.root;
           this.hideNavbar = root.children[0].snapshot.data.hideTopbar;
 
+          console.log(root);
+
           this.url = e.url;
         }
       })

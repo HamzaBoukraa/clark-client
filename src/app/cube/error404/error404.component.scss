@@ -1,0 +1,27 @@
+.wrapper {
+    width: 100%;
+    /* whatever width you want */
+    display: inline-block;
+    position: relative;
+    background: url("../../../assets/images/error404.png") top center no-repeat;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    margin: 0 auto;
+  }
+  
+  .wrapper:after {
+    padding-top: 66%;
+    /* this image is 4096x2731 so set the padding top % to match 2731/4096 = .66 */
+    display: block;
+    content: '';
+  }
+
+  .main {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    color: white;
+    text-align: center;
+  }

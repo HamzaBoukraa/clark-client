@@ -18,6 +18,11 @@ export class FooterComponent implements OnInit {
       const root: ActivatedRoute = this.route.root;
       this.hideFooter = root.children[0].snapshot.data.hideNavbar;
     });
+
+    //For the error 404 page, we want the footer to be hidden, so we set it to true
+    if (this.router.url === '/error404') {
+      this.hideFooter = true;
+    }
   }
 
 }
