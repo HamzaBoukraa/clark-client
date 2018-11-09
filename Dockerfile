@@ -32,7 +32,7 @@ RUN npm install -g cypress
 
 RUN ls
 
-RUN ng serve --port 4200
+RUN npm start 
 
 RUN npm run e2e
 
