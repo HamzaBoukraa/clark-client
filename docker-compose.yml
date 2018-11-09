@@ -1,0 +1,9 @@
+version: '3.4'
+
+# We need an image for Cypress configuration 
+
+# We need to pull the offical mongodb image and seed it with a static file 
+
+# Start all services
+
+# npm run e2e
