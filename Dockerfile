@@ -1,3 +1,5 @@
+#https://testdriven.io/testing-angular-with-cypress-and-docker
+
 # Create image based on the official Node 6 image from dockerhub
 FROM node:8 as builder
 
@@ -18,23 +20,8 @@ WORKDIR /opt/src/app
 COPY . /opt/src/app
 
 # Serve the app
-CMD ["npm", "start"]
+RUN npm start
 
-FROM cypress/browsers:chrome67 as tester
-
-WORKDIR /opt/src/app
-COPY --from=builder /opt/src/app .
-
-RUN npm install && npm cache clean --force
-ENV PATH /opt/node_modules/.bin:$PATH
-
-RUN npm install -g cypress
-
-RUN ls
-
-RUN npm start 
-
-RUN npm run e2e
 
 
 

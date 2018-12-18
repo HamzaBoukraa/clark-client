@@ -1,9 +1,191 @@
 version: '3.4'
+# ==========================================================================================
+# Start with: 
+# docker-compose run cypress ./node_modules/.bin/cypress run \ --config baseUrl=http://127.0.0.1
+# ==========================================================================================
+# This docker-compose file is responsible for orchestrating two images 
+# The first image builds the Angular application 
+# The second image runs Cypress tests on that image
+# ==========================================================================================
+services: 
 
-# We need an image for Cypress configuration 
+  # ==========================================================================================
+  # Frontend build
+  # ==========================================================================================
+  angular:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '80:80'
 
-# We need to pull the offical mongodb image and seed it with a static file 
+  # ==========================================================================================
+  # Test configuration
+  # ==========================================================================================
+  cypress:
+    build:
+      context: .
+      dockerfile: Dockerfile-cypress
+    depends_on:
+      - angular
+    # By setting network_mode to host, 
+    # the Cypress container will be able to access localhost from the host machine.
+    network_mode: 'host'
 
-# Start all services
+  # ==========================================================================================
+  # Database configuration
+  # ==========================================================================================
+  # This image creates a local instance of MongoDB that our application can connect to
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=secinj
+      - MONGO_INITDB_ROOT_PASSWORD=7800-York-Rd.
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+        - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
 
-# npm run e2e
+  # This image is responsible for seeding the newly created MongoDB instance
+  mongo-seed:
+    build: ./Dockerfile-mongo-seed
+    links:
+      - mongodb
+
+  # ==========================================================================================
+  # Backend build
+  # ==========================================================================================
+  cart-service:
+    image: cyber4all/library-service:latest
+    depends_on:
+      - mongodb
+    environment:
+      - IN_DOCKER=true
+      - NODE_ENV=development
+      - PORT=6000
+      - CLARK_DB_URI=mongodb://secinj:<DB_PASSWORD>@localhost:<CLARK_DB_PORT>/<CLARK_DB_NAME>
+      - CLARK_DB_URI_DEV=mongodb://secinj:<DB_PASSWORD>@localhost:<CLARK_DB_PORT>/<CLARK_DB_NAME>
+      - CLARK_DB_PWD=7800-York-Rd.
+      - CLARK_DB_PORT=27017
+      - CLARK_DB_NAME=cart-service
+      - LEARNING_OBJECT_SERVICE_URI=http://learning-object-service:5000
+      - KEY='/bjwoIBgG&de*rR*cmGws}1xpl[!QMMC#nj`iTHK~GU^niHE/IkM+Wkn3)61)8_'
+      - ISSUER='C.L.A.R.K. - Cybersecurity Labs and Resource Knowledge-base'
+      - SERVICE_KEY='THIS IS A SERVICE KEY'
+  clark-gateway:
+    image: cyber4all/clark-gateway:latest 
+    depends_on:
+      - mongodb
+    ports:
+      - "3000:3000"
+    environment:
+      - IN_DOCKER=true
+      - NODE_ENV=development
+      - PORT=3000
+      - USERS_API=user-service:4000
+      - LEARNING_OBJECT_SERVICE_URI=learning-object-service:5000
+      - CART_API=cart-service:6000
+      - BUSINESS_CARD_API='http://ec2-34-226-190-22.compute-1.amazonaws.com:3000'
+      - KEY='/bjwoIBgG&de*rR*cmGws}1xpl[!QMMC#nj`iTHK~GU^niHE/IkM+Wkn3)61)8_'
+      - ISSUER='C.L.A.R.K. - Cybersecurity Labs and Resource Knowledge-base'
+      - APP_STATUS_URI=https://ph3804n0wk.execute-api.us-east-2.amazonaws.com/dev/status
+      - RATING_API=http://ratings-service:3004
+  learning-object-service:
+    image: cyber4all/learning-object-service:latest
+    depends_on:
+      - mongodb
+    ports: 
+      - "5000:5000"
+    environment:
+      - IN_DOCKER=true
+      - NODE_ENV=development
+      - PORT=5000
+      - CLARK_DB_URI=mongodb://secinj:<DB_PASSWORD>@localhost:<CLARK_DB_PORT>/<CLARK_DB_NAME>
+      - CLARK_DB_URI_DEV=mongodb://secinj:<DB_PASSWORD>@localhost:<CLARK_DB_PORT>/<CLARK_DB_NAME>
+      - CLARK_DB_PWD=7800-York-Rd.
+      - CLARK_DB_PORT=27017
+      - CLARK_DB_NAME=onion
+      - CART_API=http://cart-service:6000
+      - AWS_ACCESS_KEY_ID=AKIAICS4RH5QQC7QNDWA
+      - AWS_SECRET_ACCESS_KEY=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
+      - AWS_REGION=us-east-2
+      - KEY='/bjwoIBgG&de*rR*cmGws}1xpl[!QMMC#nj`iTHK~GU^niHE/IkM+Wkn3)61)8_'
+      - ISSUER='C.L.A.R.K. - Cybersecurity Labs and Resource Knowledge-base'
+      - SERVICE_KEY='THIS IS A SERVICE KEY'
+      - WHITELISTURL="https://raw.githubusercontent.com/Cyber4All/clark-client/master/whitelist/whitelist.json"
+  outcome-suggestion-service:
+    image: cyber4all/outcome-suggestion-service:latest
+    depends_on:
+      - mongodb
+    ports: 
+      - "7000:7000"
+    environment:
+      - IN_DOCKER=true
+      - NODE_ENV=development
+      - PORT=7000
+      - CLARK_DB_URI=mongodb://secinj:<DB_PASSWORD>@localhost:<CLARK_DB_PORT>/<CLARK_DB_NAME>
+      - CLARK_DB_URI_DEV=mongodb://secinj:<DB_PASSWORD>@localhost:<CLARK_DB_PORT>/<CLARK_DB_NAME>
+      - CLARK_DB_PWD=7800-York-Rd.
+      - CLARK_DB_PORT=27017
+      - CLARK_LO_SUGGESTION_THRESHOLD=1.25
+      - CLARK_DB_NAME=onion
+  user-service:
+    image: cyber4all/user-service:latest
+    depends_on:
+      - mongodb
+    environment:
+      - IN_DOCKER=true
+      - NODE_ENV=development
+      - PORT=4000
+      - CLARK_DB_URI=mongodb://secinj:<DB_PASSWORD>@localhost:<CLARK_DB_PORT>/<CLARK_DB_NAME>
+      - CLARK_DB_URI_DEV=mongodb://secinj:<DB_PASSWORD>@localhost:<CLARK_DB_PORT>/<CLARK_DB_NAME>
+      - CLARK_DB_PWD=7800-York-Rd.
+      - CLARK_DB_PORT=27017
+      - CLARK_DB_NAME=onion
+      - SENTRY_URI='https://1fd3f26d01db4b1b88b3f466ee2bcf0c:11c741ba08424d60b50e9adb2e253621@sentry.io/270207'
+      - SENDGRID_API_KEY=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
+      - CAPTCHA_SECRET = '6LfS5kwUAAAAAGMcyq0dKaI_hvK372NjTBpLcWTu'
+      - OTA_CODE_SECRET='F2JajdE1b60CLARKiEXTQ2Kvq9JYbgJZHdd2'
+      - OTA_CODE_ISSUER='C.L.A.R.K. - Cybersecurity Labs and Resource Knowledge-base OTAManager'
+      - TOKEN_REPLACER='.'
+      - TOKEN_REPLACMENT='.'
+      - OTA_CODE_REPLACER='-'
+      - OTA_CODE_REPLACEMENT='-'
+      - DEFAULT_REDIRECT=https://clark.center
+      - AUTH_REDIRECT=https://clark.center/auth
+      - COOKIE_DOMAIN=localhost
+      - KEY='/bjwoIBgG&de*rR*cmGws}1xpl[!QMMC#nj`iTHK~GU^niHE/IkM+Wkn3)61)8_'
+      - ISSUER='C.L.A.R.K. - Cybersecurity Labs and Resource Knowledge-base'
+  ratings-service:
+    image: cyber4all/clark-ratings:latest
+    depends_on:
+      - mongodb
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=development
+      - PORT=3004
+      - CLARK_DB_URI=mongodb://secinj:<DB_PASSWORD>@localhost:<CLARK_DB_PORT>/<CLARK_DB_NAME>
+      - CLARK_DB_URI_DEV=mongodb://secinj:<DB_PASSWORD>@localhost:<CLARK_DB_PORT>/<CLARK_DB_NAME>
+      - CLARK_DB_PWD=7800-York-Rd.
+      - CLARK_DB_PORT=27017
+      - CLARK_DB_NAME=onion
+      - LEARNING_OBJECT_SERVICE_URI=http://learning-object-service:5000
+      - KEY='/bjwoIBgG&de*rR*cmGws}1xpl[!QMMC#nj`iTHK~GU^niHE/IkM+Wkn3)61)8_'
+      - ISSUER='C.L.A.R.K. - Cybersecurity Labs and Resource Knowledge-base'
+      - SERVICE_KEY='THIS IS A SERVICE KEY'
+      - SENTRY_URI='https://1fd3f26d01db4b1b88b3f466ee2bcf0c:11c741ba08424d60b50e9adb2e253621@sentry.io/270207'
+      - OTA_CODE_SECRET='F2JajdE1b60CLARKiEXTQ2Kvq9JYbgJZHdd2'
+      - OTA_CODE_ISSUER='C.L.A.R.K. - Cybersecurity Labs and Resource Knowledge-base OTAManager'
+      - TOKEN_REPLACER='.'
+      - TOKEN_REPLACMENT='.'
+      - OTA_CODE_REPLACER='-'
+      - OTA_CODE_REPLACEMENT='-'
+      - DEFAULT_REDIRECT='https://clark.center'
+      - AUTH_REDIRECT='https://clark.center/auth'
+      - COOKIE_DOMAIN='localhost'
+    
