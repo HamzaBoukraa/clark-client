@@ -33,7 +33,9 @@
         <!-- This element has a dropzone tag as a backup in case the browser doesn't support the dragover event or something goes wrong -->
         <onion-file-manager *ngIf="!retrieving; else loadingTemplate" [confirmDeletion]="confirmDeletion$" [files$]="files$"
           [folderMeta$]="folderMeta$" (openDZ)="openDZ()" (fileDeleted)="handleDeletion($event)" (fileEdited)="handleEdit($event)"
-          (path)="openPath=$event"></onion-file-manager>
+          (path)="openPath=$event" [dropzone]="config" (drop)="handleDrop()" (addedFile)="addFile($event)" (dragLeave)="toggleDrag(false)"
+          (sending)="fileSending($event)" (uploadProgress)="uploadProgress($event)" (complete)="dzComplete($event)"
+          (success)="uploadSuccess()" (queueComplete)="queueComplete($event)" (error)="handleError($event)" (canceled)="handleCanceled($event)"></onion-file-manager>
       </div>
       <div [@fadeIn] *ngIf="slide === 2" class="slide slide2">
         <clark-url-manager [urls]="(learningObject$|async)?.materials?.urls" (add)="addURL()" (update)="updateUrl($event)"
