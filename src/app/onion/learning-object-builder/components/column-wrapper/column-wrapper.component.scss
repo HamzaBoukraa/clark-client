@@ -1,7 +1,7 @@
 
-$left-column: minmax(240px, 300px);
-$middle-column: minmax(705px, 100vw);
-$right-column: minmax(290px, 340px);
+$left-column: minmax(240px, 0.8fr);
+$middle-column: minmax(705px, 2fr);
+$right-column: minmax(290px, 0.8fr);
 
 .columns {
   display: grid;
