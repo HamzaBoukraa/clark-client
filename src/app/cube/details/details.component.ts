@@ -49,14 +49,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
   // This is used by the cart service to target the iframe in this component when the action-panel download function is triggered
   iframeParent = iframeParentID;
 
-  @HostListener('window:keyup', ['$event'])
-  handleKeyUp(event: KeyboardEvent) {
-    if (event.keyCode === 27) {
-      // hide the new rating popup when escape key is pressed
-      this.showAddRating = false;
-    }
-  }
-
   constructor(
     private learningObjectService: LearningObjectService,
     public userService: UserService,
