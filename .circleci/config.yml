@@ -28,9 +28,9 @@ jobs:
       - attach_workspace : 
           at: ~/clark-client
       - run:
-          name: Run e2e Tests
+          name: List Directory
           command: |
-            echo "Test coming soon"
+            ls -a .
   deploy:
     <<: *defaults
     steps:
