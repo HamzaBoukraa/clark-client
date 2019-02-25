@@ -25,12 +25,17 @@ jobs:
   test:
     <<: *defaults
     steps:  
-      - attach_workspace : 
-          at: ~/clark-client
+      - attach_workspace: 
+          at: ~/clark-client/dist
       - run:
-          name: List Directory
+          name: List Current Dir
           command: |
             ls -a .
+      - run:
+          name: List Dist Dir
+          command: |
+            ls -a ./dist
+            
   deploy:
     <<: *defaults
     steps:
