@@ -14,7 +14,7 @@
       <ng-container *cdkVirtualFor="let item of directoryListing">
         <!-- Folder -->
         <clark-folder-list-item
-          *ngIf="item.children"
+          *ngIf="item.folders"
           class="folder"
           (clicked)="openFolder(item.name)"
           (menuClicked)="handleMenuClicked($event, item)"
@@ -26,7 +26,7 @@
 
         <!-- File -->
         <clark-file-list-item
-          *ngIf="!item.children"
+          *ngIf="!item.folders"
           class="file"
           (clicked)="openFile(item)"
           (menuClicked)="handleMenuClicked($event, item)"
