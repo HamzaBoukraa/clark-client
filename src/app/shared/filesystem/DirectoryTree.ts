@@ -299,15 +299,18 @@ export class DirectoryNode {
   private path: string;
   private files: LearningObject.Material.File[];
   private parent: DirectoryNode;
-  private children: DirectoryNode[];
+  private folders: DirectoryNode[];
   public description: string;
+
+  private fileMap: Map<string, number> = new Map();
+  private folderMap: Map<string, number> = new Map();
 
   constructor(name: string, path: string, parent: DirectoryNode) {
     this.name = name;
     this.path = path;
     this.files = [];
     this.parent = parent;
-    this.children = [];
+    this.folders = [];
     this.description = '';
   }
   /**
@@ -337,14 +340,27 @@ export class DirectoryNode {
   public getPath(): string {
     return this.path;
   }
+
   /**
-   * Get Node's children
+   * Returns folder by name
+   *
+   * @param {string} name [The name of the folder to return]
+   * @returns {DirectoryNode}
+   * @memberof DirectoryNode
+   */
+  public getFolder(name: string): DirectoryNode {
+    const cachedIndex = this.folderMap.get(name);
+    const childIndex = cachedIndex != null ? cachedIndex : -1;
+    return this.folders[childIndex];
+  }
+  /**
+   * Get Node's folders
    *
    * @returns {DirectoryNode[]}
    * @memberof DirectoryNode
    */
-  public getChildren(): DirectoryNode[] {
-    return this.children;
+  public getFolders(): DirectoryNode[] {
+    return this.folders;
   }
   /**
    * Gets Files in Directory
@@ -356,24 +372,18 @@ export class DirectoryNode {
     return this.files;
   }
   /**
-   * Add Child to Node
+   * Add Folder to Node
    *
-   * @param {DirectoryNode} child
+   * @param {DirectoryNode} newFolder
    * @returns {DirectoryNode}
    * @memberof DirectoryNode
    */
-  public addChild(newChild: DirectoryNode): DirectoryNode {
-    let canAdd = true;
-    for (const child of this.children) {
-      if (newChild.name === child.name) {
-        canAdd = false;
-        break;
-      }
+  public addFolder(newFolder: DirectoryNode): DirectoryNode {
+    if (!this.folderMap.get(newFolder.name)) {
+      this.folderMap.set(newFolder.name, this.folders.length);
+      this.folders.push(newFolder);
     }
-    if (canAdd) {
-      this.children.push(newChild);
-    }
-    return newChild;
+    return newFolder;
   }
   /**
    * Add File to Node's files
@@ -382,16 +392,28 @@ export class DirectoryNode {
    * @memberof DirectoryNode
    */
   public addFile(newFile: LearningObject.Material.File) {
-    let canAdd = true;
-    for (const file of this.files) {
-      if (file.name === newFile.name) {
-        canAdd = false;
-        break;
+    if (!this.fileMap.get(newFile.name)) {
+      this.fileMap.set(newFile.name, this.files.length);
+      this.files.push(newFile);
       }
     }
-    if (canAdd) {
-      this.files.push(newFile);
+  /**
+   * Remove folder from Node's children by folderName
+   *
+   * @param {string} folderName
+   * @returns {DirectoryNode}
+   * @memberof DirectoryNode
+   */
+  public removeFolder(folderName: string): DirectoryNode {
+    const index = this.folderMap.get(folderName);
+    if (index) {
+      const deleted = this.folders[index];
+      this.folders.splice(index, 1);
+      this.folderMap.delete(folderName);
+      this.reIndexCacheMap(index, this.folders, this.folderMap);
+      return deleted;
     }
+    return null;
   }
   /**
    * Remove file from Node's files by filename
@@ -401,27 +423,37 @@ export class DirectoryNode {
    * @memberof DirectoryNode
    */
   public removeFile(filename: string): LearningObject.Material.File {
-    const index = this.findFile(filename);
+    const index = this.fileMap.get(filename);
+    if (index) {
     const deleted = this.files[index];
     this.files.splice(index, 1);
+      this.fileMap.delete(filename);
+      this.reIndexCacheMap(index, this.files, this.fileMap);
     return deleted;
   }
+    return null;
+  }
+
   /**
-   * Finds file by filename
+   * Re-indexes cache map to match modified array
+   * Only values after the deleted index get re-indexed
    *
    * @private
-   * @param {string} filename
-   * @returns {number}
+   * @param {number} deletedIndex [The index the element was deleted at]
+   * @param {Array<DirectoryNode | LearningObject.Material.File>} modifiedArray [The array the element was spliced from]
+   * @param {Map<string, number>} cacheMap [The cache map to be re-indexed]
    * @memberof DirectoryNode
    */
-  private findFile(filename: string): number {
-    let index = 0;
-    for (let i = 0; i < this.files.length; i++) {
-      if (this.files[i].name === filename) {
-        index = i;
-        break;
+  private reIndexCacheMap(
+    deletedIndex: number,
+    modifiedArray: Array<DirectoryNode | LearningObject.Material.File>,
+    cacheMap: Map<string, number>
+  ): void {
+    if (deletedIndex <= modifiedArray.length - 1) {
+      for (let i = deletedIndex; i < modifiedArray.length; i++) {
+        const element = modifiedArray[i];
+        cacheMap.set((element as any).name, i);
       }
     }
-    return index;
   }
 }
