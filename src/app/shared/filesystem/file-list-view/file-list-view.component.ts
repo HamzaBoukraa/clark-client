@@ -7,7 +7,7 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { DirectoryNode } from '../DirectoryTree';
 import { FormControl } from '@angular/forms';
 import { DescriptionUpdate } from '../file-browser/file-browser.component';
@@ -24,9 +24,7 @@ export class FileListViewComponent implements OnInit, OnDestroy {
   @Input()
   canManage = false;
   @Input()
-  node$: BehaviorSubject<DirectoryNode> = new BehaviorSubject<DirectoryNode>(
-    null
-  );
+  node$: Subject<DirectoryNode> = new Subject();
   @Output()
   emitPath: EventEmitter<string> = new EventEmitter<string>();
   @Output()
@@ -63,7 +61,11 @@ export class FileListViewComponent implements OnInit, OnDestroy {
    */
   private subToDirChange() {
     this.node$.pipe(takeUntil(this.killSub$)).subscribe(node => {
-      this.directoryListing = node.getChildren().concat(node.getFiles() as any);
+      this.directoryListing = node.getFolders().concat(node.getFiles() as any);
+      console.log(
+        'TCL: FileListViewComponent -> subToDirChange -> this.directoryListing',
+        this.directoryListing
+      );
     });
   }
 
