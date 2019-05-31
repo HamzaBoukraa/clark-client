@@ -7,7 +7,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { ContextMenuComponent, ContextMenuService } from 'ngx-contextmenu';
 
 import { DirectoryNode } from '../../../../../../shared/filesystem/DirectoryTree';
@@ -33,11 +33,9 @@ export class FileManagerComponent implements OnInit, OnDestroy {
   public newOptions: ContextMenuComponent;
 
   @Input()
-  files$: BehaviorSubject<LearningObject.Material.File[]> = new BehaviorSubject<
-    LearningObject.Material.File[]
-  >([]);
+  files: LearningObject.Material.File[] = [];
   @Input()
-  folderMeta$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  folderMeta: LearningObject.Material.FolderDescription[] = [];
   @Input()
   confirmDeletion: Subject<boolean> = new Subject<boolean>();
   @Output()

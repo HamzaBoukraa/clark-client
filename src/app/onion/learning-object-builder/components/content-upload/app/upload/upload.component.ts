@@ -19,7 +19,7 @@ import { ToasterService } from '../../../../../../shared/toaster';
 import { environment } from '../../environments/environment';
 import { TOOLTIP_TEXT } from '@env/tooltip-text';
 import { LearningObject } from '@entity';
-import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
+import { fromEvent, Observable, Subject } from 'rxjs';
 
 import { ModalService } from '../../../../../../shared/modals';
 import { USER_ROUTES } from '@env/route';
@@ -136,13 +136,6 @@ export class UploadComponent implements OnInit, AfterViewInit, OnDestroy {
     headers: {}
   };
 
-  files$: BehaviorSubject<LearningObject.Material.File[]> = new BehaviorSubject<
-    LearningObject.Material.File[]
-  >([]);
-  folderMeta$: BehaviorSubject<
-    LearningObject.Material.FolderDescription[]
-  > = new BehaviorSubject<LearningObject.Material.FolderDescription[]>([]);
-
   inProgressFileUploads = [];
   inProgressFolderUploads = [];
   inProgressUploadsMap: Map<string, number> = new Map<string, number>();
@@ -181,10 +174,8 @@ export class UploadComponent implements OnInit, AfterViewInit, OnDestroy {
             learningObjectId: object.id,
             authorUsername: object.author.username
           });
-          this.files$.next(object.materials.files);
-          this.folderMeta$.next(object.materials.folderDescriptions);
           this.solutionUpload = false;
-          this.files$.value.forEach(file => {
+          object.materials.files.forEach(file => {
             if (file.name.toLowerCase().indexOf('solution') >= 0) {
               this.solutionUpload = true;
             }
@@ -339,36 +330,36 @@ export class UploadComponent implements OnInit, AfterViewInit, OnDestroy {
           this.inProgressFileUploads.length - 1
         );
       }
-        if (file.upload.chunked) {
-          // Request multipart upload
-          const learningObject = await this.learningObject$
-            .pipe(take(1))
-            .toPromise();
+      if (file.upload.chunked) {
+        // Request multipart upload
+        const learningObject = await this.learningObject$
+          .pipe(take(1))
+          .toPromise();
 
-          // FIXME: Conditional block for TESTING PURPOSES ONLY. Remove after test of file upload service is completed
-          let uploadId = '';
-          if (this.userIsPrivileged) {
-            const fileUploadMeta: FileUploadMeta = {
-              name: file.name,
-              path: file.fullPath || file.name,
-              fileType: file.type,
-              size: file.size
-            };
-            uploadId = await this.fileStorage.initMultipartAdmin({
-              fileUploadMeta,
-              fileId: file.upload.uuid,
-              learningObjectId: learningObject.id,
-              authorUsername: learningObject.author.username
-            });
-          } else {
-            uploadId = await this.fileStorage.initMultipart({
-              learningObject,
-              fileId: file.upload.uuid,
-              filePath: file.fullPath ? file.fullPath : file.name
-            });
-          }
-          this.uploadIds[file.upload.uuid] = uploadId;
+        // FIXME: Conditional block for TESTING PURPOSES ONLY. Remove after test of file upload service is completed
+        let uploadId = '';
+        if (this.userIsPrivileged) {
+          const fileUploadMeta: FileUploadMeta = {
+            name: file.name,
+            path: file.fullPath || file.name,
+            fileType: file.type,
+            size: file.size
+          };
+          uploadId = await this.fileStorage.initMultipartAdmin({
+            fileUploadMeta,
+            fileId: file.upload.uuid,
+            learningObjectId: learningObject.id,
+            authorUsername: learningObject.author.username
+          });
+        } else {
+          uploadId = await this.fileStorage.initMultipart({
+            learningObject,
+            fileId: file.upload.uuid,
+            filePath: file.fullPath ? file.fullPath : file.name
+          });
         }
+        this.uploadIds[file.upload.uuid] = uploadId;
+      }
       this.dzDirectiveRef.dropzone().processFile(file);
     } catch (error) {
       this.error$.next(error);
