@@ -1,4 +1,5 @@
-import { debounceTime, takeUntil } from 'rxjs/operators';
+
+import {debounceTime} from 'rxjs/operators';
 import {
   Component,
   OnInit,
@@ -7,13 +8,14 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { DirectoryNode } from '../DirectoryTree';
+import { BehaviorSubject ,  Subscription } from 'rxjs';
+import { DirectoryNode, } from '../DirectoryTree';
+import { getIcon } from '../file-icons';
 import { FormControl } from '@angular/forms';
 import { DescriptionUpdate } from '../file-browser/file-browser.component';
+import { TimeFunctions } from '../../../onion/learning-object-builder/components/content-upload/app/shared/time-functions';
 import { LearningObject } from '@entity';
 import { AuthService } from 'app/core/auth.service';
-import { getPreviewUrl } from '../file-functions';
 
 @Component({
   selector: 'clark-file-list-view',
@@ -39,32 +41,57 @@ export class FileListViewComponent implements OnInit, OnDestroy {
     item: any;
   }> = new EventEmitter();
 
+  private subscriptions: Subscription[] = [];
   private editableFile: LearningObject.Material.File | DirectoryNode;
-
-  private killSub$: Subject<boolean> = new Subject();
-
   descriptionControl = new FormControl();
   preview = true;
 
-  directoryListing = [];
+  microsoftPreviewUrl = 'https://view.officeapps.live.com/op/embed.aspx?src=';
+  previewable: Map<string, string[]> = new Map();
 
-  constructor(private auth: AuthService) {}
+  getIcon = (extension: string) => getIcon(extension);
 
-  ngOnInit(): void {
-    this.subToDirChange();
-    this.subToDescription();
+  getTimestampAge = (timestamp: string) =>
+    TimeFunctions.getTimestampAge(+timestamp);
+
+  getFolderTimestamp = (
+    node: DirectoryNode = this.node$.getValue(),
+    timestamp: number = 0
+  ): number => {
+    // This is currently the only way to get this value, but we should be mindful that there may be a performance
+    // cost that comes through this type of iteration in the browser.
+    const derivedTimestamp = node
+      .getFiles()
+      .map(x => parseInt(x.date, 10))
+      .sort((a, b) => (a < b ? 1 : -1))[0];
+    timestamp = timestamp > derivedTimestamp ? timestamp : derivedTimestamp;
+
+    for (const folder of node.getChildren()) {
+      return this.getFolderTimestamp(folder, timestamp);
+    }
+
+    return timestamp;
   }
 
-  /**
-   * Subscribes to current node to detect directory changes. Refreshes directory listing with folders and files at current node
-   *
-   * @private
-   * @memberof FileListViewComponent
-   */
-  private subToDirChange() {
-    this.node$.pipe(takeUntil(this.killSub$)).subscribe(node => {
-      this.directoryListing = node.getChildren().concat(node.getFiles() as any);
-    });
+  constructor(private auth: AuthService) {
+    // set which extensions can be previewed and how
+    this.previewable.set('microsoft', [
+      'doc',
+      'docx',
+      'xls',
+      'xlsx',
+      'ppt',
+      'pptx',
+      'odt',
+      'ott',
+      'oth',
+      'odm'
+    ]);
+    this.previewable.set('browser', ['pdf']);
+  }
+
+  ngOnInit(): void {
+    this.subToDescription();
   }
 
   /**
@@ -74,57 +101,54 @@ export class FileListViewComponent implements OnInit, OnDestroy {
    * @memberof FileListViewComponent
    */
   private subToDescription() {
-    this.descriptionControl.valueChanges
-      .pipe(
-        takeUntil(this.killSub$),
-        debounceTime(1000)
-      )
-      .subscribe(description => {
-        if (description) {
-          this.updateDescription(description);
+    this.subscriptions.push(
+      this.descriptionControl.valueChanges.pipe(
+        debounceTime(1000))
+        .subscribe(description => {
+          if (description) {
+            this.updateDescription(description);
+          }
+        })
+    );
+  }
+
+  previewUrl(ext: string): string {
+    let returnType: string;
+
+    if (this.auth.isLoggedIn.getValue()) {
+      this.previewable.forEach((exts: string[], key: string) => {
+        if (ext && exts.includes(ext.replace('.', ''))) {
+          // send a space character here to evaluate truthy but not affect the final preview url
+          returnType = key === 'microsoft' ? this.microsoftPreviewUrl : ' ';
+          return;
         }
       });
+    }
+
+    return returnType;
   }
 
   /**
    * Emits desired path if not clicking an input field
    *
    * @param {string} path
+   * @param {*} $event
    * @memberof FileListViewComponent
    */
-  openFolder(path: string): void {
-    this.emitPath.emit(path);
+  openFolder(path: string, $event: any): void {
+    if ($event.target.nodeName !== 'INPUT') {
+      this.emitPath.emit(path);
+    }
   }
 
-  /**
-   * Opens file preview if the user is logged in
-   *
-   * @param {LearningObject.Material.File} file
-   * @memberof FileListViewComponent
-   */
   openFile(file: LearningObject.Material.File): void {
-    const url = this.auth.isLoggedIn.value ? getPreviewUrl(file) : '';
+    const url = this.previewUrl(file.extension);
     if (url) {
       window.open(url + file.url, '_blank');
       this.preview = true;
     } else {
       this.preview = false;
     }
-  }
-
-  /**
-   * Emits event indicating context menu should be opened
-   *
-   * @param {MouseEvent} event
-   * @param {(DirectoryNode | LearningObject.Material.File)} item
-   * @memberof FileListViewComponent
-   */
-  handleMenuClicked(
-    event: MouseEvent,
-    item: DirectoryNode | LearningObject.Material.File
-  ) {
-    event.stopPropagation();
-    this.emitContextOpen.next({ event, item });
   }
 
   returnToFileView() {
@@ -150,23 +174,9 @@ export class FileListViewComponent implements OnInit, OnDestroy {
     this.emitDesc.emit({ description, file: this.editableFile });
   }
 
-  /**
-   * Track by function to improve performance of ngFor/cdkFor loop
-   *
-   * @param {number} index [Index of the current element]
-   * @param {(DirectoryNode | LearningObject.Material.File)} elm [The current element]
-   * @returns
-   * @memberof FileListViewComponent
-   */
-  trackItems(index: number, elm: DirectoryNode | LearningObject.Material.File) {
-    if (elm instanceof DirectoryNode) {
-      return elm.getPath();
-    }
-    return elm.id || index;
-  }
-
   ngOnDestroy() {
-    this.killSub$.next(true);
-    this.killSub$.unsubscribe();
+    for (const sub of this.subscriptions) {
+      sub.unsubscribe();
+    }
   }
 }
