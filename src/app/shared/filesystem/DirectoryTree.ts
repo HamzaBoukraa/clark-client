@@ -301,7 +301,7 @@ export class DirectoryNode {
    * @memberof DirectoryNode
    */
   public addFolder(newFolder: DirectoryNode): DirectoryNode {
-    if (!this.folderMap.get(newFolder.name)) {
+    if (this.folderMap.get(newFolder.name) == null) {
       this.folderMap.set(newFolder.name, this.folders.length);
       this.folders.push(newFolder);
     }
@@ -314,7 +314,7 @@ export class DirectoryNode {
    * @memberof DirectoryNode
    */
   public addFile(newFile: LearningObject.Material.File) {
-    if (!this.fileMap.get(newFile.name)) {
+    if (this.fileMap.get(newFile.name) == null) {
       this.fileMap.set(newFile.name, this.files.length);
       this.files.push(newFile);
     }
@@ -328,7 +328,7 @@ export class DirectoryNode {
    */
   public removeFolder(folderName: string): DirectoryNode {
     const index = this.folderMap.get(folderName);
-    if (index) {
+    if (index >= 0) {
       const deleted = this.folders[index];
       this.folders.splice(index, 1);
       this.folderMap.delete(folderName);
@@ -346,7 +346,7 @@ export class DirectoryNode {
    */
   public removeFile(filename: string): LearningObject.Material.File {
     const index = this.fileMap.get(filename);
-    if (index) {
+    if (index >= 0) {
       const deleted = this.files[index];
       this.files.splice(index, 1);
       this.fileMap.delete(filename);
