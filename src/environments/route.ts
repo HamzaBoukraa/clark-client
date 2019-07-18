@@ -19,13 +19,13 @@ export const CHANGELOG_ROUTES = {
     return `${environment.apiURL}/users/${encodeURIComponent(userId)}/learning-objects/${encodeURIComponent(learningObjectId)}/changelog`;
   },
   FETCH_ALL_CHANGELOGS(params: {
-    userId: string, learningObjectId: string
+    userId: string, learningObjectId: string, minusRevision?: boolean,
   }) {
     return `${environment.apiURL}/users/${encodeURIComponent(
       params.userId,
     )}/learning-objects/${encodeURIComponent(
       params.learningObjectId,
-      )}/changelogs`;
+      )}/changelogs?minusRevision=${params.minusRevision}`;
   }
 };
 
@@ -84,6 +84,11 @@ export const USER_ROUTES = {
       username
     )}/learning-objects?children=true&text=${encodeURIComponent(query)}
     &${querystring.stringify(filters)}`;
+  },
+  GET_MY_DRAFT_LEARNING_OBJECTS(username, filters: any, query: string) {
+    // Onion Dashboard
+    return `${environment.apiURL}/users/${encodeURIComponent(username)}/learning-objects?children=true&text=${encodeURIComponent(query)}
+    &${querystring.stringify(filters)}&drafts`;
   },
   ADD_TO_MY_LEARNING_OBJECTS(username) {
     return `${environment.apiURL}/users/${encodeURIComponent(

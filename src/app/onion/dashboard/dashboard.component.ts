@@ -10,7 +10,7 @@ import { Subject } from 'rxjs';
 @Component({
   selector: 'clark-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
+  styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
   lastLocation: NavigationEnd;
@@ -20,6 +20,8 @@ export class DashboardComponent implements OnInit {
   workingLearningObjects: LearningObject[];
 
   action$: Subject<number> = new Subject();
+
+  filters: any;
 
   constructor(
     private history: HistoryService,
@@ -34,9 +36,11 @@ export class DashboardComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
-    // retrieve other status learning objects
+    // retrieve draft status learning objects
     setTimeout(async() => {
-      this.workingLearningObjects = await this.getLearningObjects({status: ['unreleased', 'proofing', 'review', 'rejected', 'waiting']});
+      this.workingLearningObjects = await this.getDraftLearningObjects(
+        {status: ['unreleased', 'proofing', 'review', 'rejected', 'waiting']}
+      );
     }, 1100);
     // retrieve released learning objects
     setTimeout(async() => {
@@ -57,6 +61,21 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
+   * Applys status filters to the draft learning objects list
+   * @param filters
+   */
+  async applyFilters(filters: any) {
+    const filter = Array.from(filters.keys());
+    if (filter.length !== 0) {
+      this.workingLearningObjects = await this.getDraftLearningObjects({status: filter});
+    } else {
+      this.workingLearningObjects = await this.getDraftLearningObjects(
+        {status: ['unreleased', 'proofing', 'review', 'rejected', 'waiting']}
+      );
+    }
+  }
+
+  /**
    * Navigates back, either to the home page or to the previous non-onion page
    */
   navigateBack() {
@@ -69,13 +88,40 @@ export class DashboardComponent implements OnInit {
     this.router.navigateByUrl(url);
   }
 
-
-  async getLearningObjects(filters?: any, query?: any): Promise<LearningObject[]> {
+  /**
+   * Retrieves an array of learningObjects to populate the draft and released list of learning objects
+   * @param filters
+   * @param query
+   */
+  async getLearningObjects(filters?: any, text?: any): Promise<LearningObject[]> {
     this.loading = true;
     return this.learningObjectService
-    .getLearningObjects(this.auth.username, filters, query)
+    .getLearningObjects(this.auth.username, filters, text)
     .then((children: LearningObject[]) => {
+      this.loading = false;
       return children;
     });
+  }
+
+  /**
+   * Retrieves an array of learningObjects to populate the draft list of learning objects
+   * This will only retrieve the drafts and will not retrieve any revisions of a learning object
+   * @param filters
+   * @param text
+   */
+  async getDraftLearningObjects(filters?: any, text?: any): Promise<LearningObject[]> {
+    this.loading = true;
+    return this.learningObjectService
+    .getDraftLearningObjects(this.auth.username, filters, text)
+    .then((children: LearningObject[]) => {
+      this.loading = false;
+      return children;
+    });
+  }
+
+  async performSearch(text: string) {
+    this.releasedLearningObjects = await this.getLearningObjects({status: ['released']}, text);
+    this.workingLearningObjects = await this.getDraftLearningObjects(
+      {status: ['unreleased', 'proofing', 'review', 'rejected', 'waiting']}, text);
   }
 }
