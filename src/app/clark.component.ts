@@ -72,9 +72,6 @@ export class ClarkComponent implements OnInit {
     private titleService: Title,
     private _: HistoryService,
   ) {
-    // TODO make request to determine if application is "down" or not
-    this.isUnderMaintenance = false;
-
     this.isSupportedBrowser = !(/msie\s|trident\/|edge\//i.test(window.navigator.userAgent));
     !this.isSupportedBrowser ? this.router.navigate(['/unsupported']) :
       this.authService.isLoggedIn.subscribe(val => {

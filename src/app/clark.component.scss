@@ -1,7 +1,28 @@
+@import '~_vars.scss';
+
 clark-cookies {
     z-index: 20;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
+}
+
+.loading-template {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  color: $dark-grey;
+
+  .svg-inline--fa {
+    color: $light-blue;
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
 }
