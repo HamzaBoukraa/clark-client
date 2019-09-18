@@ -70,6 +70,7 @@ export class ClarkComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private titleService: Title,
+    // this is injected here so that it will begin tracking the application's history on load
     private _: HistoryService,
   ) {
     this.isSupportedBrowser = !(/msie\s|trident\/|edge\//i.test(window.navigator.userAgent));
