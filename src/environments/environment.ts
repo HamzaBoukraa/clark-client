@@ -12,7 +12,7 @@ export const environment = {
   contentManagerURL: 'http://localhost:5000',
   contentManagerURLAdmin: 'http://localhost:5100',
   adminAppUrl: 'http://localhost:4100',
-  s3Bucket: 'clark-dev-file-uploads',
+  s3Bucket: 'clark-prod-file-uploads-backup',
   s3BucketRegion: 'us-east-1',
   cognitoRegion: 'us-east-1',
   cognitoIdentityPoolId: 'us-east-1:08c3533f-4e0b-4014-9bfe-12a347cb6272',
